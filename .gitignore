@@ -16,3 +16,6 @@ dependency-reduced-pom.xml
 *.swp
 *.swo
 .cache
+
+#Finatra
+logs/
