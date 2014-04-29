@@ -72,7 +72,7 @@
             <configuration>
               <archive>
                 <manifest>
-                  <mainClass>HelloApp</mainClass>
+                  <mainClass>Music</mainClass>
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                   <addClasspath>true</addClasspath>
                   <classpathPrefix>lib/</classpathPrefix>
