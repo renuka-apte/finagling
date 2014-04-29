@@ -3,8 +3,6 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.kiji.express.flow.util.ResourceUtil._
 import org.kiji.schema.layout.KijiTableLayout
 import org.kiji.schema.{KijiTableReaderPool, KijiTable, KijiColumnName, KijiURI}
-import scala.util.parsing.json.JSONObject
-import scala.util.parsing.json.JSONObject
 
 class SongMetadataProvider(config: SongMetadataConfig, log: Logger) {
   var mTableURI: KijiURI = null
