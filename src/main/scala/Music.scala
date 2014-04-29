@@ -3,8 +3,6 @@ import com.twitter.finatra.{FinatraServer, Request, Controller}
 
 class MusicController extends Controller {
 
-  import Music._
-
   get("/:song") { (request: Request) =>
     val name: String = request.routeParams.getOrElse("song", "default user")
     //val res = mSmp.getSongMetadata(name)
@@ -20,10 +18,11 @@ object Music extends FinatraServer {
   var mSmp: SongMetadataProvider = if (kijiURI.isDefined) {
     new SongMetadataProvider(SongMetadataConfig(kijiURI()), log)
   } else null
-  register(new MusicController)*/
+  */
  val thingFlag = flag("thingEnabled", true, "Is the thing enabled")
 
   if (thingFlag()) {
     println("thing is enabled")
   }
+  register(new MusicController)
 }

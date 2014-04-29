@@ -1,6 +1,6 @@
 import com.twitter.logging.Logger
 import org.apache.hadoop.hbase.HBaseConfiguration
-import org.kiji.express.flow.util.ResourceUtil._
+//import org.kiji.express.flow.util.ResourceUtil._
 import org.kiji.schema.layout.KijiTableLayout
 import org.kiji.schema.{KijiTableReaderPool, KijiTable, KijiColumnName, KijiURI}
 import scala.util.parsing.json.JSONObject
@@ -23,7 +23,7 @@ class SongMetadataProvider(config: SongMetadataConfig, log: Logger) {
     mTableURI = KijiURI.newBuilder(config.songTable).build()
     mColumnName = mTableURI.getColumns.get(0)
 
-    val conf = HBaseConfiguration.create()
+    /*val conf = HBaseConfiguration.create()
     withKijiTable(mTableURI, conf) {
       table: KijiTable => {
         mProductsTable = table
@@ -33,7 +33,7 @@ class SongMetadataProvider(config: SongMetadataConfig, log: Logger) {
             .build()
         mTableLayout = table.getLayout
       }
-    }
+    } */
   }
 
   def getSongMetadata(songName: String): String = {
