@@ -20,8 +20,8 @@ object Music extends FinatraServer {
   val kijiURI: Flag[String] = flag("songtable", "", "Kiji table that contains song metadata")
 
   premain {
-    log.info("premain called")
-    log.info(System.getProperty("java.class.path"))
+    log.info("premain called. Classpath:")
+    log.info(System.getProperty("java.class.path") + "\n")
     val mSmp: SongMetadataProvider = if (kijiURI.isDefined) {
       new SongMetadataProvider(SongMetadataConfig(kijiURI()), log)
     } else null
