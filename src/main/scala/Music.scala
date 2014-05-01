@@ -1,19 +1,7 @@
 import com.twitter.app.Flag
-import com.twitter.finatra.{FinatraServer, Request, Controller}
+import com.twitter.finatra.FinatraServer
 
-class MusicController(val mSmp: SongMetadataProvider) extends Controller {
-
-  get("/") { request =>
-    render.plain("hi. enter a song using /:song").toFuture
-  }
-
-  get("/:song") { (request: Request) =>
-    val name: String = request.routeParams.getOrElse("song", "default user")
-    //val res = mSmp.getSongMetadata(name)
-    render.plain("hello! " + name).toFuture
-  }
-
-}
+// TODO: We have no cleanup for the Kiji Reader Pool and such
 
 object Music extends FinatraServer {
   log.info("Music constructor starts.")
@@ -22,13 +10,14 @@ object Music extends FinatraServer {
   premain {
     log.info("premain called. Classpath:")
     log.info(System.getProperty("java.class.path") + "\n")
-    val mSmp: SongMetadataProvider = if (kijiURI.isDefined) {
-      new SongMetadataProvider(SongMetadataConfig(kijiURI()), log)
+    val mSmp: SongProvider = if (kijiURI.isDefined) {
+      new SongProvider(SongMetadataConfig(kijiURI()), log)
     } else null
     if (null != mSmp ) {
-      register(new MusicController(mSmp))
+      register(new MusicMetadataController(mSmp))
+      register(new MusicRecsController(mSmp))
     } else {
-      throw new Exception("Need to specify songtable")
+      throw new Exception("Need to specify flag songtable.")
     }
   }
 }
