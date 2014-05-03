@@ -1,3 +1,0 @@
-trait RecsFilter {
-  def filter
-}

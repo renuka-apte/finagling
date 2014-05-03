@@ -1,3 +1,5 @@
+package finagling
+
 import com.twitter.logging.Logger
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.util.Utf8
@@ -6,6 +8,7 @@ import org.kiji.express.flow.util.ResourceUtil._
 import org.kiji.schema.{EntityId => JEntityId, KijiDataRequest, KijiRowData, KijiTableReader, KijiTableReaderPool, KijiTable, KijiColumnName, KijiURI}
 import org.kiji.schema.layout.KijiTableLayout
 import scala.collection.JavaConverters._
+import org.kiji.schema.util.ToJson
 
 class SongProvider(config: SongMetadataConfig, log: Logger) {
   var mTableURI: KijiURI = null
@@ -22,7 +25,7 @@ class SongProvider(config: SongMetadataConfig, log: Logger) {
   setup(config)
 
   def setup(config: SongMetadataConfig) {
-    mLogger.debug("Setup SongMetadataProvider")
+    mLogger.info("Setup SongMetadataProvider")
 
     mTableURI = KijiURI.newBuilder(config.songTable).build()
 
@@ -39,20 +42,30 @@ class SongProvider(config: SongMetadataConfig, log: Logger) {
     }
   }
 
-  def getSongMetadata(songName: String): String = {
+  /**
+   * Return metadata for songs.
+   *
+   * @param songNames The names of the songs for which metadata is being requested.
+   * @return A comma separated list of Json strings representing the metadata for the song.
+   */
+  def getSongMetadata(songNames: Seq[String]): String = {
     def reader: KijiTableReader = mReaderPool.borrowObject()
 
-    val eid: JEntityId = mProductsTable.getEntityId(songName)
-    val rows: KijiRowData = {
+    val eids: Seq[JEntityId] = songNames.map(mProductsTable.getEntityId(_))
+    val rows: Seq[KijiRowData] = {
       doAndClose(reader) { tableReader: KijiTableReader =>
-        tableReader.get(
-          eid,
+        tableReader.bulkGet(
+          eids.asJava,
           KijiDataRequest.create(mFamilyName, mMetadataQualifier)
-        )
+        ).asScala
       }
     }
-    val gr = rows.getMostRecentValue(mFamilyName, mMetadataQualifier).asInstanceOf[GenericRecord]
-    new String(gr.get("artist_name").asInstanceOf[Utf8].getBytes, "UTF-8")
+    val metadataJsons: Seq[String] = rows.map { metadata: KijiRowData =>
+      val record = metadata.getMostRecentValue(mFamilyName, mMetadataQualifier)
+      ToJson.toJsonString(record)
+    }
+
+    metadataJsons.mkString(",")
   }
 
   private def recToTuple(rec: GenericRecord): (String, Long) = {

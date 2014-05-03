@@ -1,8 +1,11 @@
-import com.twitter.app.Flag
+package finagling
+
 import com.twitter.finatra.FinatraServer
+import com.twitter.app.Flag
 
-// TODO: We have no cleanup for the Kiji Reader Pool and such
-
+/**
+ * Created by renuka on 5/2/14.
+ */
 object Music extends FinatraServer {
   log.info("Music constructor starts.")
   val kijiURI: Flag[String] = flag("songtable", "", "Kiji table that contains song metadata")

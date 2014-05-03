@@ -1,0 +1,39 @@
+@namespace("finagling")
+protocol ScoreCombiners {
+    enum CompareOp {
+        EQUAL,
+        NOT_EQUAL,
+        GREATER,
+        GREATER_OR_EQUAL,
+        LESS,
+        LESS_OR_EQUAL,
+        NO_OP
+    }
+
+    record SongPredicate {
+        string attribute;
+        CompareOp operator;
+        union {null, int, long, string, boolean, float, double} value = null;
+    }
+
+    record TestScore {
+        int rank;
+        int weight;
+    }
+
+    record TestProductMetaData {
+        int product_id;
+        TestScore score;
+        string category;
+    }
+
+    /** Stolen from KijiMusic. */
+    record SongMetadata {
+        string song_name;
+        string artist_name;
+        string album_name;
+        string genre;
+        long tempo;
+        long duration;
+    }
+}

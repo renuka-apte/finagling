@@ -1,5 +1,10 @@
-import com.twitter.finatra.{Request, Controller, FinatraServer}
+package finagling
 
+import com.twitter.finatra.{Request, Controller}
+
+/**
+ * Created by renuka on 5/2/14.
+ */
 class HelloWorld extends Controller {
 
   get("/:song") { (request: Request) =>
@@ -7,8 +12,4 @@ class HelloWorld extends Controller {
     render.plain("hello " + name).toFuture
   }
 
-}
-
-object HelloApp extends FinatraServer {
-  register(new HelloWorld())
 }
