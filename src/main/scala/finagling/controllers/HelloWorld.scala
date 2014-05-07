@@ -1,4 +1,4 @@
-package finagling
+package finagling.controllers
 
 import com.twitter.finatra.{Request, Controller}
 

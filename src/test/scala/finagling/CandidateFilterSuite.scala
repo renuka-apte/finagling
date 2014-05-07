@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import org.apache.avro.generic.GenericRecord
+import finagling.lib.CandidateFilter
 
 @RunWith(classOf[JUnitRunner])
 class CandidateFilterSuite extends FunSuite {

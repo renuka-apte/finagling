@@ -1,4 +1,4 @@
-package finagling
+package finagling.lib
 
 trait CandidateSelect {
   /**

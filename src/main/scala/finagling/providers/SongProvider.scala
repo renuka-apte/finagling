@@ -1,18 +1,19 @@
-package finagling
+package finagling.providers
 
 import com.twitter.logging.Logger
-import org.apache.avro.generic.GenericRecord
+import org.apache.avro.generic.{GenericDatumWriter, GenericRecord}
 import org.apache.avro.util.Utf8
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.kiji.express.flow.util.ResourceUtil._
-import org.kiji.schema.{EntityId => JEntityId, KijiDataRequest, KijiRowData, KijiTableReader, KijiTableReaderPool, KijiTable, KijiColumnName, KijiURI}
+import org.kiji.schema.{EntityId => JEntityId, KijiDataRequest, KijiRowData, KijiTableReader, KijiTableReaderPool, KijiTable, KijiURI}
 import org.kiji.schema.layout.KijiTableLayout
 import scala.collection.JavaConverters._
-import org.kiji.schema.util.ToJson
+import java.io.{IOException, ByteArrayOutputStream}
+import org.apache.avro.io.{EncoderFactory, JsonEncoder}
+import org.apache.hadoop.hbase.util.Bytes
 
 class SongProvider(config: SongMetadataConfig, log: Logger) {
   var mTableURI: KijiURI = null
-  var mColumnName: KijiColumnName = null
   var mProductsTable: KijiTable = null
   var mReaderPool: KijiTableReaderPool = null
   var mTableLayout: KijiTableLayout = null
@@ -48,7 +49,7 @@ class SongProvider(config: SongMetadataConfig, log: Logger) {
    * @param songNames The names of the songs for which metadata is being requested.
    * @return A comma separated list of Json strings representing the metadata for the song.
    */
-  def getSongMetadata(songNames: Seq[String]): String = {
+  def getSongMetadata(songNames: Seq[String]): Seq[String] = {
     def reader: KijiTableReader = mReaderPool.borrowObject()
 
     val eids: Seq[JEntityId] = songNames.map(mProductsTable.getEntityId(_))
@@ -61,11 +62,24 @@ class SongProvider(config: SongMetadataConfig, log: Logger) {
       }
     }
     val metadataJsons: Seq[String] = rows.map { metadata: KijiRowData =>
-      val record = metadata.getMostRecentValue(mFamilyName, mMetadataQualifier)
-      ToJson.toJsonString(record)
+      log.info(metadata.getEntityId.getComponentByIndex(0))
+      val record: GenericRecord = metadata.getMostRecentValue(mFamilyName, mMetadataQualifier)
+      //ToJson.toJsonString(record)
+      try {
+        val jsonOutputStream: ByteArrayOutputStream = new ByteArrayOutputStream
+        val jsonEncoder: JsonEncoder = EncoderFactory.get.jsonEncoder(record.getSchema, jsonOutputStream)
+        val writer: GenericDatumWriter[GenericRecord] = new GenericDatumWriter[GenericRecord](record.getSchema)
+        writer.write(record, jsonEncoder)
+        jsonEncoder.flush()
+        log.info(Bytes.toString(jsonOutputStream.toByteArray))
+        Bytes.toString(jsonOutputStream.toByteArray)
+      } catch {
+        case ioe: IOException => {
+          throw new RuntimeException("Internal error: " + ioe)
+        }
+      }
     }
-
-    metadataJsons.mkString(",")
+    metadataJsons
   }
 
   private def recToTuple(rec: GenericRecord): (String, Long) = {

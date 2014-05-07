@@ -1,6 +1,7 @@
-package finagling
+package finagling.servers
 
 import com.twitter.finatra.FinatraServer
+import finagling.controllers.HelloWorld
 
 /**
  * Created by renuka on 5/2/14.

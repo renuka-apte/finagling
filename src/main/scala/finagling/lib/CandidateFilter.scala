@@ -1,7 +1,8 @@
-package finagling
+package finagling.lib
 
 import org.apache.avro.generic.GenericRecord
 import finagling.CompareOp._
+import finagling.{CompareOp, SongPredicate}
 
 class CandidateFilter[K](val songPredicate: SongPredicate)(implicit ordering: Ordering[K]) extends CandidateSelect {
   require(songPredicate.getValue.isInstanceOf[K])
@@ -71,5 +72,11 @@ class CandidateFilter[K](val songPredicate: SongPredicate)(implicit ordering: Or
    */
   def filter(candidates: Seq[GenericRecord]): Seq[GenericRecord] = {
     super.filter(candidates, predicate)
+  }
+}
+
+object CandidateFilter {
+  def apply[K](songPredicate: SongPredicate)(implicit ordering: Ordering[K]): CandidateFilter[K] = {
+    new CandidateFilter[K](songPredicate)(ordering)
   }
 }

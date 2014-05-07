@@ -1,11 +1,10 @@
-package finagling
+package finagling.servers
 
 import com.twitter.finatra.FinatraServer
 import com.twitter.app.Flag
+import finagling.controllers.{MusicRecsController, MusicMetadataController}
+import finagling.providers.{SongMetadataConfig, SongProvider}
 
-/**
- * Created by renuka on 5/2/14.
- */
 object Music extends FinatraServer {
   log.info("Music constructor starts.")
   val kijiURI: Flag[String] = flag("songtable", "", "Kiji table that contains song metadata")

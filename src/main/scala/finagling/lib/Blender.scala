@@ -1,4 +1,4 @@
-package finagling
+package finagling.lib
 
 /**
  * Created by renuka on 5/2/14.
